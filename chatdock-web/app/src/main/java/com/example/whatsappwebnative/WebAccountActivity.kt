@@ -466,66 +466,107 @@ abstract class WebAccountActivity : AppCompatActivity() {
 
         private const val OPEN_WHATSAPP_CHAT_MENU_SCRIPT = """
             (function() {
-                function isVisible(element) {
-                    if (!element) return false;
-                    var rect = element.getBoundingClientRect();
-                    var style = window.getComputedStyle(element);
-                    return rect.width > 0 && rect.height > 0 &&
-                        style.visibility !== "hidden" &&
-                        style.display !== "none";
+                function rectOf(element) {
+                    return element ? element.getBoundingClientRect() : null;
                 }
 
-                function closestAction(element) {
-                    if (!element) return null;
-                    return element.closest("button,[role='button']");
+                function isVisible(element) {
+                    if (!element) return false;
+                    var rect = rectOf(element);
+                    var style = window.getComputedStyle(element);
+                    return rect &&
+                        rect.width >= 20 &&
+                        rect.height >= 20 &&
+                        style.visibility !== "hidden" &&
+                        style.display !== "none" &&
+                        style.opacity !== "0";
+                }
+
+                function normalizedText(element) {
+                    return [
+                        element.getAttribute("aria-label") || "",
+                        element.getAttribute("title") || "",
+                        element.getAttribute("data-testid") || "",
+                        element.getAttribute("data-icon") || "",
+                        element.textContent || ""
+                    ].join(" ").toLowerCase();
+                }
+
+                function hasMenuIcon(element) {
+                    return !!element.querySelector("[data-icon='menu'],[data-icon='down-context'],[data-icon='more'],svg[aria-label*='menu' i]");
+                }
+
+                function dispatchRealClick(element) {
+                    var rect = rectOf(element);
+                    var x = rect.left + rect.width / 2;
+                    var y = rect.top + rect.height / 2;
+                    element.focus && element.focus();
+                    ["pointerdown", "mousedown", "pointerup", "mouseup", "click"].forEach(function(type) {
+                        element.dispatchEvent(new MouseEvent(type, {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window,
+                            clientX: x,
+                            clientY: y
+                        }));
+                    });
                 }
 
                 var main = document.querySelector("#main") ||
                     document.querySelector("[data-testid='conversation-panel-wrapper']") ||
-                    document.querySelector("[role='main']");
+                    Array.from(document.querySelectorAll("[role='main']")).sort(function(a, b) {
+                        return rectOf(b).right - rectOf(a).right;
+                    })[0];
                 if (!main || !isVisible(main)) return false;
 
-                var mainRect = main.getBoundingClientRect();
-                var headerLimit = mainRect.top + 96;
-                var rightHalf = mainRect.left + (mainRect.width * 0.45);
+                var mainRect = rectOf(main);
+                var headers = Array.from(main.querySelectorAll("header")).filter(isVisible);
+                headers.sort(function(a, b) {
+                    var ar = rectOf(a);
+                    var br = rectOf(b);
+                    return Math.abs(ar.top - mainRect.top) - Math.abs(br.top - mainRect.top);
+                });
+                var header = headers[0] || main;
+                var headerRect = rectOf(header);
 
-                function isChatHeaderCandidate(action) {
+                var actions = Array.from(header.querySelectorAll("button,[role='button'],[tabindex='0']")).filter(function(action) {
                     if (!isVisible(action)) return false;
-                    var rect = action.getBoundingClientRect();
-                    return rect.left >= rightHalf &&
-                        rect.top >= mainRect.top &&
-                        rect.top <= headerLimit &&
-                        rect.right <= mainRect.right + 4;
+                    var rect = rectOf(action);
+                    return rect.top >= headerRect.top - 4 &&
+                        rect.bottom <= headerRect.bottom + 8 &&
+                        rect.left >= mainRect.left + (mainRect.width * 0.50) &&
+                        rect.right <= mainRect.right + 8;
+                });
+
+                if (actions.length === 0) {
+                    actions = Array.from(main.querySelectorAll("button,[role='button'],[tabindex='0']")).filter(function(action) {
+                        if (!isVisible(action)) return false;
+                        var rect = rectOf(action);
+                        return rect.top >= mainRect.top &&
+                            rect.top <= mainRect.top + 96 &&
+                            rect.left >= mainRect.left + (mainRect.width * 0.50) &&
+                            rect.right <= mainRect.right + 8;
+                    });
                 }
 
-                var candidates = [];
-                var menuLabels = ["Menu", "More options", "Chat menu", "Conversation menu"];
-
-                menuLabels.forEach(function(label) {
-                    main.querySelectorAll("[aria-label='" + label + "']").forEach(function(element) {
-                        var action = closestAction(element) || element;
-                        if (isChatHeaderCandidate(action)) candidates.push(action);
-                    });
+                var menuActions = actions.filter(function(action) {
+                    var text = normalizedText(action);
+                    return text.indexOf("menu") >= 0 ||
+                        text.indexOf("more") >= 0 ||
+                        text.indexOf("options") >= 0 ||
+                        hasMenuIcon(action);
                 });
 
-                main.querySelectorAll("[data-icon='menu'],[data-icon='down-context'],span[data-icon='menu']").forEach(function(element) {
-                    var action = closestAction(element);
-                    if (isChatHeaderCandidate(action)) candidates.push(action);
+                var pool = menuActions.length > 0 ? menuActions : actions;
+                pool.sort(function(a, b) {
+                    var ar = rectOf(a);
+                    var br = rectOf(b);
+                    return br.right - ar.right || ar.top - br.top;
                 });
 
-                var unique = candidates.filter(function(element, index, array) {
-                    return array.indexOf(element) === index;
-                });
-
-                unique.sort(function(a, b) {
-                    var ar = a.getBoundingClientRect();
-                    var br = b.getBoundingClientRect();
-                    return ar.top - br.top || br.right - ar.right;
-                });
-
-                var target = unique[0];
+                var target = pool[0];
                 if (!target) return false;
-                target.click();
+                dispatchRealClick(target);
                 return true;
             })();
         """
