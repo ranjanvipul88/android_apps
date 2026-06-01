@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7FAF8"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/screen_lock"
+        android:textColor="#11352B"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/info_panel"
+        android:padding="12dp"
+        android:text="@string/screen_lock_note"
+        android:textColor="#21483D"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/newPinInput"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="18dp"
+        android:hint="@string/new_pin"
+        android:inputType="numberPassword"
+        android:maxLength="12" />
+
+    <EditText
+        android:id="@+id/confirmPinInput"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="10dp"
+        android:hint="@string/confirm_pin"
+        android:inputType="numberPassword"
+        android:maxLength="12" />
+
+    <Button
+        android:id="@+id/savePinButton"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#11352B"
+        android:text="@string/save_pin"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF" />
+
+    <Button
+        android:id="@+id/disablePinButton"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="#8A2D2D"
+        android:text="@string/disable_screen_lock"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF" />
+</LinearLayout>

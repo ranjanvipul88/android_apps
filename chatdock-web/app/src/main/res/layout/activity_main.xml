@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7FAF8"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_launcher_foreground" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textColor="#11352B"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/app_tagline"
+            android:textColor="#47645B"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/multiAccountNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/info_panel"
+            android:padding="14dp"
+            android:textColor="#21483D"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/accountOneButton"
+            style="@style/AccountButton" />
+
+        <Button
+            android:id="@+id/accountTwoButton"
+            style="@style/AccountButton" />
+
+        <Button
+            android:id="@+id/accountThreeButton"
+            style="@style/AccountButton" />
+
+        <Button
+            android:id="@+id/accountFourButton"
+            style="@style/AccountButton" />
+
+        <Button
+            android:id="@+id/accountFiveButton"
+            style="@style/AccountButton" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/tools_title"
+            android:textColor="#11352B"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/statusSaverButton"
+            style="@style/AccountButton"
+            android:text="@string/status_saver" />
+
+        <Button
+            android:id="@+id/messageRecoveryButton"
+            style="@style/AccountButton"
+            android:text="@string/message_recovery" />
+
+        <Button
+            android:id="@+id/screenLockButton"
+            style="@style/AccountButton"
+            android:text="@string/screen_lock" />
+
+    </LinearLayout>
+</ScrollView>

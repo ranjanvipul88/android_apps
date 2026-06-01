@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ChatDock Web</string>
+    <string name="app_tagline">Multiple secure web chat sessions in one clean dock.</string>
+    <string name="account_isolation_ready">Choose a slot, scan the official web QR code, and keep each account in its own isolated WebView profile.</string>
+    <string name="account_isolation_limited">This Android version does not fully support separate WebView profiles. For reliable multi-account switching, use Android 9 or newer.</string>
+    <string name="open_account_button">Open Account %1$d</string>
+    <string name="open_named_account_button">Open %1$s</string>
+    <string name="default_account_name">Account %1$d</string>
+    <string name="rename_account_title">Rename Account %1$d</string>
+    <string name="save">Save</string>
+    <string name="account_title">Account %1$d</string>
+    <string name="switch_accounts">Switch</string>
+    <string name="menu_symbol">...</string>
+    <string name="open_whatsapp_chat_menu">WhatsApp chat menu</string>
+    <string name="whatsapp_chat_menu_unavailable">Open a chat first, then try again.</string>
+    <string name="open_in_browser">Open in Chrome</string>
+    <string name="print_page">Print</string>
+    <string name="translate_page">Translate</string>
+    <string name="reload_page">Reload</string>
+    <string name="share_page">Share</string>
+    <string name="lock_now">Lock now</string>
+    <string name="print_job_name">ChatDock Web page</string>
+    <string name="no_file_picker">No file picker available.</string>
+    <string name="download_description">Downloading chat media to Downloads/ChatDock Web</string>
+    <string name="download_started">Download started.</string>
+    <string name="tools_title">Tools</string>
+    <string name="status_saver">Status Saver</string>
+    <string name="status_saver_note">Select status photos or videos you can access on this phone. ChatDock saves them to Downloads/ChatDock Status Saver and lets you repost them with Android share.</string>
+    <string name="pick_status_media">Select Photos or Videos</string>
+    <string name="repost_last_saved_status">Repost Last Saved</string>
+    <string name="repost_status">Repost status</string>
+    <string name="status_saved">Saved to Downloads/ChatDock Status Saver.</string>
+    <string name="status_save_failed">Could not save selected media.</string>
+    <string name="no_saved_status_to_repost">Save a status first.</string>
+    <string name="message_recovery">Message Recovery</string>
+    <string name="message_recovery_note">This records future message previews delivered through this app\'s web notification bridge. It cannot restore old deleted messages from WhatsApp databases or bypass encryption.</string>
+    <string name="clear_recovered_messages">Clear recovered messages</string>
+    <string name="no_recovered_messages">No recovered message previews yet.</string>
+    <string name="screen_lock">Screen Lock</string>
+    <string name="screen_lock_note">Set a PIN to lock ChatDock Web when the app restarts or when you choose Lock now from an account menu.</string>
+    <string name="app_locked">ChatDock Web is locked</string>
+    <string name="enter_pin">Enter PIN</string>
+    <string name="unlock">Unlock</string>
+    <string name="new_pin">New PIN</string>
+    <string name="confirm_pin">Confirm PIN</string>
+    <string name="save_pin">Save PIN</string>
+    <string name="disable_screen_lock">Disable Screen Lock</string>
+    <string name="invalid_pin">Invalid PIN.</string>
+    <string name="pin_too_short">PIN must be at least 4 digits.</string>
+    <string name="pin_mismatch">PINs do not match.</string>
+    <string name="screen_lock_enabled">Screen Lock enabled.</string>
+    <string name="screen_lock_disabled">Screen Lock disabled.</string>
+
+    <plurals name="saved_status_count">
+        <item quantity="one">Saved %1$d item to Downloads/ChatDock Status Saver.</item>
+        <item quantity="other">Saved %1$d items to Downloads/ChatDock Status Saver.</item>
+    </plurals>
+</resources>
