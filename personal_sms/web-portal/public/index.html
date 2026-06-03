@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages for Web (SMS/MMS Replica)</title>
+  <!-- Google Fonts: Roboto and Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="m3-dark-theme">
+
+  <!-- ================= AUTHENTICATION / PAIRING SCREEN ================= -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-card">
+      <div class="auth-header">
+        <!-- Sleek Custom SMS/MMS SVG Icon -->
+        <svg class="app-logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" rx="16" fill="url(#logo-grad)"/>
+          <path d="M16 22C16 18.6863 18.6863 16 22 16H42C45.3137 16 48 18.6863 48 22V38C48 41.3137 45.3137 44 42 44H26L17.4142 52.5858C16.7812 53.2188 15.7 52.77 15.7 51.8787V44.8C15.89 44.5 16 22 16 22Z" fill="white" fill-opacity="0.15"/>
+          <path d="M20 20C17.7909 20 16 21.7909 16 24V38C16 40.2091 17.7909 42 20 42H38L45.2929 49.2929C45.9229 49.9229 47 49.4767 47 48.5858V42C49.2091 42 51 40.2091 51 38V24C51 21.7909 49.2091 20 47 20H20Z" fill="white"/>
+          <!-- Cellular wave inside icon representing SMS/MMS cellular signal -->
+          <path d="M26 31V33M31 28V33M36 25V33M41 22V33" stroke="#1A73E8" stroke-width="2.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="logo-grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#1A73E8"/>
+              <stop offset="1" stop-color="#8AB4F8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <h1>Messages for Web</h1>
+        <p class="subtitle">Secure Cellular SMS & MMS Backup Portal</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="tab-login" class="tab-btn active">Web Login</button>
+        <button id="tab-pair" class="tab-btn">Pair Android Phone</button>
+      </div>
+
+      <!-- Tab 1: Email/Password Login -->
+      <div id="login-form-container" class="tab-content active">
+        <form id="login-form">
+          <div class="input-group">
+            <span class="material-icons-round">alternate_email</span>
+            <input type="email" id="login-email" placeholder="Email Address" required value="admin@messages.sms">
+          </div>
+          <div class="input-group">
+            <span class="material-icons-round">lock</span>
+            <input type="password" id="login-password" placeholder="Password" required value="admin123">
+          </div>
+          <button type="submit" class="m3-btn-primary">
+            <span>Log In</span>
+            <span class="material-icons-round">arrow_forward</span>
+          </button>
+        </form>
+        <div class="login-tip">
+          <span class="material-icons-round">info</span>
+          <span>Log in with the seeded developer credentials: <strong>admin@messages.sms</strong> &amp; <strong>admin123</strong></span>
+        </div>
+      </div>
+
+      <!-- Tab 2: Pair Phone QR Simulation -->
+      <div id="pair-container" class="tab-content">
+        <p class="pair-instructions">Open the <strong>Google Messages SMS/MMS</strong> app on your phone, navigate to settings, and type this pair key to sync your cellular messages securely.</p>
+        <div class="qr-box">
+          <div class="qr-scanner-overlay"></div>
+          <!-- Animated Pulsing QR representing instant sync -->
+          <div class="qr-graphic" id="qr-element">
+            <!-- Simulated QR code content using visual SVG paths -->
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="100" height="100" fill="white" rx="4"/>
+              <rect x="8" y="8" width="24" height="24" stroke="black" stroke-width="4" fill="none"/>
+              <rect x="14" y="14" width="12" height="12" fill="black"/>
+              <rect x="68" y="8" width="24" height="24" stroke="black" stroke-width="4" fill="none"/>
+              <rect x="74" y="14" width="12" height="12" fill="black"/>
+              <rect x="8" y="68" width="24" height="24" stroke="black" stroke-width="4" fill="none"/>
+              <rect x="14" y="74" width="12" height="12" fill="black"/>
+              <!-- Custom high density pixel blocks -->
+              <path d="M40 8h4v8h-4zm8 0h8v4h-8zm12 0h4v4h-4zm-20 12h8v4h-8zm12 0h4v8h-4zm-12 8h4v4h-4zm8 0h4v8h-4zm8 0h8v4h-8zm8 0h4v4h-4zm-24 8h8v4h-8zm12 0h4v4h-4zm8 0h4v8h-4zm8 0h4v4h-4zm-32 8h4v4h-4zm12 0h8v4h-8zm12 0h4v4h-4zm-24 8h8v4h-8zm12 0h4v4h-4zm8 0h8v8h-8zm-20 8h4v4h-4zm8 0h8v4h-8zm12 0h4v4h-4z" fill="black"/>
+            </svg>
+          </div>
+        </div>
+        <div class="pair-code-badge">
+          <span>Pairing Key:</span>
+          <strong id="pair-token-display">MSG-000000</strong>
+        </div>
+        <div class="pair-status-footer">
+          <span class="spinner"></span>
+          <span>Waiting for phone connection...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MAIN WEB ACCESS DASHBOARD ================= -->
+  <div id="dashboard-screen" class="screen">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <!-- SVG Logo in Header -->
+        <svg class="header-logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" rx="16" fill="url(#logo-grad-small)"/>
+          <path d="M20 20C17.7909 20 16 21.7909 16 24V38C16 40.2091 17.7909 42 20 42H38L45.2929 49.2929C45.9229 49.9229 47 49.4767 47 48.5858V42C49.2091 42 51 40.2091 51 38V24C51 21.7909 49.2091 20 47 20H20Z" fill="white"/>
+          <path d="M26 31V33M31 28V33M36 25V33M41 22V33" stroke="#1A73E8" stroke-width="2.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="logo-grad-small" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#1A73E8"/>
+              <stop offset="1" stop-color="#8AB4F8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="app-title">Messages</span>
+        <div class="tag-badge">SMS/MMS Portal</div>
+      </div>
+
+      <!-- Telemetry Info of Paired Device -->
+      <div class="device-telemetry" id="device-telemetry">
+        <div class="telemetry-item" title="Device Name">
+          <span class="material-icons-round">smartphone</span>
+          <span id="paired-device-name">Paired Android App</span>
+        </div>
+        <div class="telemetry-item" title="Cell Network Connection">
+          <span class="material-icons-round" id="network-icon">signal_cellular_4_bar</span>
+          <span id="paired-device-network">Strong</span>
+        </div>
+        <div class="telemetry-item" title="Battery Status">
+          <span class="material-icons-round" id="battery-icon">battery_std</span>
+          <span id="paired-device-battery">85%</span>
+        </div>
+        <div class="telemetry-status-dot active"></div>
+        <span class="status-lbl">Phone Sync Online</span>
+      </div>
+
+      <!-- Header Right Settings -->
+      <div class="header-right">
+        <button id="toggle-forward-panel" class="header-btn" title="Auto-Forward Settings">
+          <span class="material-icons-round">shortcut</span>
+        </button>
+        <button id="toggle-simulator" class="header-btn" title="SMS Traffic Simulator">
+          <span class="material-icons-round">terminal</span>
+        </button>
+        <button id="logout-btn" class="header-btn" title="Sign Out">
+          <span class="material-icons-round">logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <div class="main-container">
+      
+      <!-- Side Pane (Conversations list) -->
+      <aside class="sidebar">
+        <!-- Search and filters -->
+        <div class="search-box-container">
+          <div class="search-bar">
+            <span class="material-icons-round">search</span>
+            <input type="text" id="search-input" placeholder="Search conversations...">
+            <span class="material-icons-round hidden" id="search-clear">close</span>
+          </div>
+        </div>
+
+        <!-- Filter pills -->
+        <div class="filter-pills">
+          <button class="pill active" data-category="all">
+            <span class="material-icons-round">chat</span>
+            <span>All</span>
+          </button>
+          <button class="pill" data-category="starred">
+            <span class="material-icons-round">star</span>
+            <span>Starred</span>
+          </button>
+          <button class="pill" data-category="images">
+            <span class="material-icons-round">image</span>
+            <span>Images</span>
+          </button>
+          <button class="pill" data-category="audio">
+            <span class="material-icons-round">mic</span>
+            <span>Voice</span>
+          </button>
+          <button class="pill" data-category="links">
+            <span class="material-icons-round">link</span>
+            <span>Links</span>
+          </button>
+        </div>
+
+        <!-- Conversations List -->
+        <div class="conv-list" id="conv-list-container">
+          <!-- Populated dynamically via JS -->
+          <div class="empty-state-side">
+            <span class="material-icons-round">forum</span>
+            <p>No conversations synced yet</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Central Chat Pane -->
+      <main class="chat-pane">
+        <!-- Welcome / Empty Chat Screen -->
+        <div id="chat-empty-state" class="chat-empty active">
+          <svg viewBox="0 0 100 100" fill="none" class="empty-gfx" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="40" fill="#1e293b"/>
+            <path d="M35 42.5h30M35 50h20M35 57.5h15" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+            <path d="M45 70l-8 8V70H30V30H70V70H45z" stroke="#3b82f6" stroke-width="4" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <h2>Keep your phone close</h2>
+          <p>Select a contact to view text history and reply. Sync sessions remain active for up to 99 years without signing out.</p>
+        </div>
+
+        <!-- Real Active Conversation view -->
+        <div id="chat-view" class="chat-view-container">
+          <!-- Chat Header -->
+          <div class="chat-header">
+            <div class="chat-contact-info">
+              <div class="contact-avatar" id="active-avatar">C</div>
+              <div class="contact-text">
+                <h3 id="active-contact-name">Contact Name</h3>
+                <p id="active-contact-phone">Phone Number</p>
+              </div>
+            </div>
+            <div class="chat-header-actions">
+              <button class="chat-header-btn" title="Search message history">
+                <span class="material-icons-round">search</span>
+              </button>
+              <button class="chat-header-btn" title="More options">
+                <span class="material-icons-round">more_vert</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Message bubbles timeline -->
+          <div class="messages-timeline" id="messages-timeline">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- Typing indicator simulated -->
+          <div class="typing-indicator" id="typing-indicator">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <span>is typing...</span>
+          </div>
+
+          <!-- Send Message Input Bar -->
+          <div class="message-input-bar">
+            <button class="input-action-btn" title="Add Emojis" id="emoji-btn">
+              <span class="material-icons-round">sentiment_satisfied_alt</span>
+            </button>
+            <button class="input-action-btn" title="Attach file" id="attach-btn">
+              <span class="material-icons-round">add_circle_outline</span>
+            </button>
+            <div class="text-input-wrapper">
+              <textarea id="chat-textarea" placeholder="Text message (synced SMS)" rows="1"></textarea>
+            </div>
+            <button class="input-action-btn" title="Schedule send" id="schedule-btn">
+              <span class="material-icons-round">schedule</span>
+            </button>
+            <button class="send-message-btn" id="send-msg-btn" title="Send SMS via phone">
+              <span class="material-icons-round">send</span>
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- ================= SIDE DRAWER 1: AUTO-FORWARD CONFIG ================= -->
+      <aside class="drawer" id="forward-drawer">
+        <div class="drawer-header">
+          <span class="material-icons-round">shortcut</span>
+          <h3>SMS Auto-Forwarding</h3>
+          <button class="close-drawer-btn" id="close-forward-drawer">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="drawer-content">
+          <p class="drawer-desc">Configure your paired Android phone to automatically intercept and forward all incoming cellular SMS messages to another target phone number.</p>
+          
+          <div class="m3-card">
+            <div class="toggle-row">
+              <div class="toggle-text">
+                <strong>Enable Auto-Forwarding</strong>
+                <p>Instantly forward incoming SMS</p>
+              </div>
+              <label class="m3-switch">
+                <input type="checkbox" id="forward-enable-toggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="input-field-group">
+              <label for="forward-phone-input">Target Phone Number</label>
+              <div class="m3-input">
+                <span class="material-icons-round">phone</span>
+                <input type="tel" id="forward-phone-input" placeholder="+1 (555) 019-2834">
+              </div>
+              <p class="input-help">Must include country code (e.g. +1 for US, +91 for India)</p>
+            </div>
+
+            <button id="save-forwarding-btn" class="m3-btn-accent">
+              <span class="material-icons-round">save</span>
+              <span>Save Settings</span>
+            </button>
+          </div>
+
+          <div class="drawer-alert info">
+            <span class="material-icons-round">verified_user</span>
+            <div>
+              <strong>Instant Sync to Device</strong>
+              <p>Saving these settings remotely registers them on the paired phone. The phone will perform background forwarding using its cellular SIM.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ================= SIDE DRAWER 2: TELEPHONY TRAFFIC SIMULATOR ================= -->
+      <aside class="drawer" id="simulator-drawer">
+        <div class="drawer-header">
+          <span class="material-icons-round">terminal</span>
+          <h3>SMS Traffic Simulator</h3>
+          <button class="close-drawer-btn" id="close-simulator-drawer">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="drawer-content">
+          <p class="drawer-desc">Simulate cellular SMS signals received by your phone. The Android app intercepts these triggers, evaluates forwarding, and updates this dashboard instantly.</p>
+          
+          <form id="simulator-form" class="m3-card">
+            <div class="input-field-group">
+              <label for="sim-sender-name">Sender Contact Name</label>
+              <div class="m3-input">
+                <span class="material-icons-round">person</span>
+                <select id="sim-sender-preset">
+                  <option value="custom">-- Custom Phone Number --</option>
+                  <option value="Mom ❤️" data-phone="+15551234567">Mom ❤️</option>
+                  <option value="Project Manager 💼" data-phone="+15559876543">Project Manager 💼</option>
+                  <option value="Tech Geek 🤖" data-phone="+15553141592">Tech Geek 🤖</option>
+                  <option value="Lotto Scammer ⚠️" data-phone="+18005559999">Lotto Scammer ⚠️</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-field-group" id="sim-custom-number-container">
+              <label for="sim-sender-phone">Sender Phone Number</label>
+              <div class="m3-input">
+                <span class="material-icons-round">dialpad</span>
+                <input type="tel" id="sim-sender-phone" placeholder="+15551112222" value="+15551234567">
+              </div>
+            </div>
+
+            <div class="input-field-group">
+              <label>Message Content Type</label>
+              <div class="radio-group">
+                <label class="m3-radio">
+                  <input type="radio" name="sim-type" value="sms" checked>
+                  <span class="radio-btn"></span>
+                  <span>SMS (Text)</span>
+                </label>
+                <label class="m3-radio">
+                  <input type="radio" name="sim-type" value="mms-img">
+                  <span class="radio-btn"></span>
+                  <span>MMS (Photo)</span>
+                </label>
+                <label class="m3-radio">
+                  <input type="radio" name="sim-type" value="mms-audio">
+                  <span class="radio-btn"></span>
+                  <span>MMS (Voice Note)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="input-field-group" id="sim-text-container">
+              <label for="sim-body">SMS Body</label>
+              <textarea id="sim-body" placeholder="Type mock message body..." required>Hey honey! Just baked a cherry pie, let me know when you're coming over! 🥧</textarea>
+            </div>
+
+            <button type="submit" class="m3-btn-primary">
+              <span class="material-icons-round">send_to_mobile</span>
+              <span>Trigger Incoming SMS</span>
+            </button>
+          </form>
+
+          <div class="simulator-log-box">
+            <div class="log-box-header">
+              <span>Simulation Logs</span>
+              <button id="clear-logs-btn">Clear</button>
+            </div>
+            <div class="logs-timeline" id="logs-container">
+              <div class="log-entry system">Simulator initialized. Ready for mock inputs.</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- Notification Toast Banner -->
+  <div id="toast" class="toast-banner">
+    <span class="material-icons-round" id="toast-icon">info</span>
+    <span id="toast-message">Notification Toast!</span>
+  </div>
+
+  <!-- Script Modules -->
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

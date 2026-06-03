@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Messages (SMS/MMS)</string>
+    <string name="default_forward_number"></string>
+    <string name="sync_server_url">http://localhost:3000</string>
+</resources>

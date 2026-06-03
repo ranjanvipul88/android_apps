@@ -1,0 +1,35 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Background Circle in Material blue -->
+    <path
+        android:fillColor="#1A73E8"
+        android:pathData="M54,54m-48,0a48,48 0,1 1,96 0a48,48 0,1 1,-96 0" />
+
+    <!-- Chat Bubble Shadow Outline -->
+    <path
+        android:fillColor="#1557B0"
+        android:pathData="M28,34C28,29.58 31.58,26 36,26H72C76.42,26 80,29.58 80,34V60C80,64.42 76.42,68 72,68H44L30,82V68C28.9,68 28,67.1 28,66V34Z" />
+
+    <!-- Core Chat Bubble -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M32,32C32,28.68 34.68,26 38,26H70C73.32,26 76,28.68 76,32V58C76,61.32 73.32,64 70,64H46L34,76V64C33.1,64 32,62.9 32,62V32Z" />
+
+    <!-- Signal Transmission Antenna Lines representing SMS/MMS cell signaling -->
+    <path
+        android:strokeColor="#1A73E8"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M44,48V50M50,44V50M56,40V50M62,36V50" />
+
+    <!-- Stylized Cellular Wave Ring -->
+    <path
+        android:strokeColor="#1A73E8"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M40,36C44,32 64,32 68,36" />
+</vector>

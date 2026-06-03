@@ -1,0 +1,19 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+
+# SQLite database
+*.sqlite
+database.sqlite
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Ignored generated files
+Google-Messages-Replica-SMS.apk
+personal-messages.apk
+build/
+.gradle/
+local.properties
+.idea/
