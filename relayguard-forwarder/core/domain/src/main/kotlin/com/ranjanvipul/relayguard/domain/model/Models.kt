@@ -14,6 +14,7 @@ enum class RecipientKind {
     SmsNumber,
     Email,
     Webhook,
+    WhatsAppBusiness,
     Telegram,
     Slack
 }
@@ -100,6 +101,17 @@ data class RenderedRelay(
     val filterId: String,
     val recipient: Recipient,
     val body: String
+)
+
+data class RelayAttempt(
+    val id: Long,
+    val filterId: String,
+    val recipientId: String,
+    val recipientKind: RecipientKind,
+    val bodyPreview: String,
+    val success: Boolean,
+    val detail: String?,
+    val createdAtEpochMillis: Long
 )
 
 data class PermissionExplanation(

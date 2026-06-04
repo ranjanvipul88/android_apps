@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -26,21 +27,26 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ranjanvipul.relayguard.domain.model.ForwardFilter
 import com.ranjanvipul.relayguard.domain.model.MessageEvent
+import com.ranjanvipul.relayguard.domain.model.RelayAttempt
 
 private enum class Tab { Filters, History, Privacy, Settings }
 
@@ -49,7 +55,9 @@ private enum class Tab { Filters, History, Privacy, Settings }
 fun RelayGuardApp(
     state: RelayGuardUiState,
     onToggleFilter: (String, Boolean) -> Unit,
-    onCreateSampleFilter: () -> Unit
+    onCreateSmsForward: (String) -> Unit,
+    onCreateEmailForward: (String, String, String, String, String, String, Boolean) -> Unit,
+    onCreateWhatsAppBusinessForward: (String, String, String) -> Unit
 ) {
     var tab by remember { mutableStateOf(Tab.Filters) }
     Scaffold(
@@ -66,7 +74,7 @@ fun RelayGuardApp(
         },
         floatingActionButton = {
             if (tab == Tab.Filters) {
-                FloatingActionButton(onClick = onCreateSampleFilter) {
+                FloatingActionButton(onClick = { tab = Tab.Settings }) {
                     Icon(Icons.Outlined.Add, contentDescription = "Create forwarding rule")
                 }
             }
@@ -103,9 +111,14 @@ fun RelayGuardApp(
         Crossfade(targetState = tab, label = "screen") { current ->
             when (current) {
                 Tab.Filters -> FilterScreen(state.filters, onToggleFilter, Modifier.padding(padding))
-                Tab.History -> HistoryScreen(state.history, Modifier.padding(padding))
+                Tab.History -> HistoryScreen(state.history, state.relayAttempts, Modifier.padding(padding))
                 Tab.Privacy -> PrivacyScreen(state, Modifier.padding(padding))
-                Tab.Settings -> SettingsScreen(Modifier.padding(padding))
+                Tab.Settings -> SettingsScreen(
+                    onCreateSmsForward = onCreateSmsForward,
+                    onCreateEmailForward = onCreateEmailForward,
+                    onCreateWhatsAppBusinessForward = onCreateWhatsAppBusinessForward,
+                    modifier = Modifier.padding(padding)
+                )
             }
         }
     }
@@ -145,13 +158,32 @@ private fun FilterScreen(filters: List<ForwardFilter>, onToggle: (String, Boolea
 }
 
 @Composable
-private fun HistoryScreen(history: List<MessageEvent>, modifier: Modifier) {
+private fun HistoryScreen(history: List<MessageEvent>, attempts: List<RelayAttempt>, modifier: Modifier) {
     LazyColumn(
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (history.isEmpty()) {
+        if (history.isEmpty() && attempts.isEmpty()) {
             item { EmptyCard("No message activity", "Matched events and delivery results will appear here.") }
+        }
+        if (attempts.isNotEmpty()) {
+            item { Text("Delivery attempts", style = MaterialTheme.typography.titleMedium) }
+        }
+        items(attempts, key = { it.id }) { attempt ->
+            Card {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        if (attempt.success) "Delivered to ${attempt.recipientKind.name}" else "Failed: ${attempt.recipientKind.name}",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(attempt.detail ?: "No error reported", style = MaterialTheme.typography.bodySmall)
+                    Text(attempt.bodyPreview, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
+            }
+        }
+        if (history.isNotEmpty()) {
+            item { Text("Received messages", style = MaterialTheme.typography.titleMedium) }
         }
         items(history, key = { it.id }) { event ->
             Card {
@@ -184,12 +216,150 @@ private fun PrivacyScreen(state: RelayGuardUiState, modifier: Modifier) {
 }
 
 @Composable
-private fun SettingsScreen(modifier: Modifier) {
+private fun SettingsScreen(
+    onCreateSmsForward: (String) -> Unit,
+    onCreateEmailForward: (String, String, String, String, String, String, Boolean) -> Unit,
+    onCreateWhatsAppBusinessForward: (String, String, String) -> Unit,
+    modifier: Modifier
+) {
+    var smsPhone by rememberSaveable { mutableStateOf("") }
+    var emailTo by rememberSaveable { mutableStateOf("") }
+    var smtpHost by rememberSaveable { mutableStateOf("") }
+    var smtpPort by rememberSaveable { mutableStateOf("587") }
+    var smtpUser by rememberSaveable { mutableStateOf("") }
+    var smtpPassword by rememberSaveable { mutableStateOf("") }
+    var smtpFrom by rememberSaveable { mutableStateOf("") }
+    var smtpSsl by rememberSaveable { mutableStateOf(false) }
+    var whatsappEndpoint by rememberSaveable { mutableStateOf("") }
+    var whatsappPhone by rememberSaveable { mutableStateOf("") }
+    var whatsappToken by rememberSaveable { mutableStateOf("") }
+
     LazyColumn(
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item { EmptyCard("Delivery settings", "Configure HTTPS, SMTP, chat webhooks, local backup, and app lock in the production settings flow.") }
+        item {
+            Card {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Forward to another phone", style = MaterialTheme.typography.titleMedium)
+                    OutlinedTextField(
+                        value = smsPhone,
+                        onValueChange = { smsPhone = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Destination phone number") },
+                        singleLine = true
+                    )
+                    Button(onClick = { onCreateSmsForward(smsPhone) }, enabled = smsPhone.isNotBlank()) {
+                        Text("Enable SMS forwarding")
+                    }
+                }
+            }
+        }
+        item {
+            Card {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Forward to email", style = MaterialTheme.typography.titleMedium)
+                    OutlinedTextField(
+                        value = emailTo,
+                        onValueChange = { emailTo = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Recipient email") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = smtpHost,
+                        onValueChange = { smtpHost = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("SMTP host") },
+                        singleLine = true
+                    )
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = smtpPort,
+                            onValueChange = { smtpPort = it.filter(Char::isDigit) },
+                            modifier = Modifier.weight(1f),
+                            label = { Text("Port") },
+                            singleLine = true
+                        )
+                        Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Checkbox(checked = smtpSsl, onCheckedChange = { smtpSsl = it })
+                            Text("SSL/TLS", modifier = Modifier.padding(top = 14.dp))
+                        }
+                    }
+                    OutlinedTextField(
+                        value = smtpUser,
+                        onValueChange = { smtpUser = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("SMTP username") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = smtpPassword,
+                        onValueChange = { smtpPassword = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("SMTP password or app password") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation()
+                    )
+                    OutlinedTextField(
+                        value = smtpFrom,
+                        onValueChange = { smtpFrom = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("From address") },
+                        singleLine = true
+                    )
+                    Button(
+                        onClick = {
+                            onCreateEmailForward(emailTo, smtpHost, smtpPort, smtpUser, smtpPassword, smtpFrom, smtpSsl)
+                        },
+                        enabled = emailTo.isNotBlank() && smtpHost.isNotBlank()
+                    ) {
+                        Text("Enable email forwarding")
+                    }
+                }
+            }
+        }
+        item {
+            Card {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Forward to WhatsApp Business", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "Uses Meta's official WhatsApp Business Cloud API. Regular WhatsApp cannot receive silent app-to-app forwards.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    OutlinedTextField(
+                        value = whatsappEndpoint,
+                        onValueChange = { whatsappEndpoint = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Messages endpoint URL") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = whatsappPhone,
+                        onValueChange = { whatsappPhone = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("WhatsApp recipient phone") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = whatsappToken,
+                        onValueChange = { whatsappToken = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Cloud API bearer token") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation()
+                    )
+                    Button(
+                        onClick = {
+                            onCreateWhatsAppBusinessForward(whatsappEndpoint, whatsappPhone, whatsappToken)
+                        },
+                        enabled = whatsappEndpoint.startsWith("https://") && whatsappPhone.isNotBlank() && whatsappToken.isNotBlank()
+                    ) {
+                        Text("Enable WhatsApp forwarding")
+                    }
+                }
+            }
+        }
         item { EmptyCard("Security defaults", "Cleartext traffic is disabled outside debug/local development. Secrets are stored with Android Keystore.") }
     }
 }

@@ -27,7 +27,9 @@ class MainActivity : ComponentActivity() {
                 RelayGuardApp(
                     state = state,
                     onToggleFilter = viewModel::setFilterEnabled,
-                    onCreateSampleFilter = viewModel::createStarterFilter
+                    onCreateSmsForward = viewModel::createSmsForwardRule,
+                    onCreateEmailForward = viewModel::createEmailForwardRule,
+                    onCreateWhatsAppBusinessForward = viewModel::createWhatsAppBusinessForwardRule
                 )
             }
         }
