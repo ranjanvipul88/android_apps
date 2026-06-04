@@ -13,8 +13,9 @@ import com.ranjanvipul.relayguard.data.security.AndroidSecretStore
 import com.ranjanvipul.relayguard.data.security.SecretStore
 import com.ranjanvipul.relayguard.data.transport.ChatWebhookRelayTransport
 import com.ranjanvipul.relayguard.data.transport.CompositeRelayTransport
+import com.ranjanvipul.relayguard.data.transport.EmailRelayTransport
 import com.ranjanvipul.relayguard.data.transport.SmsRelayTransport
-import com.ranjanvipul.relayguard.data.transport.StubRelayTransport
+import com.ranjanvipul.relayguard.data.transport.WhatsAppBusinessRelayTransport
 import com.ranjanvipul.relayguard.data.transport.WebhookRelayTransport
 import com.ranjanvipul.relayguard.domain.repository.FilterRepository
 import com.ranjanvipul.relayguard.domain.repository.MessageLogRepository
@@ -70,11 +71,17 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRelayTransport(@ApplicationContext context: Context, api: RelayApi, secrets: SecretStore): RelayTransport =
+    fun provideRelayTransport(
+        @ApplicationContext context: Context,
+        api: RelayApi,
+        client: OkHttpClient,
+        secrets: SecretStore
+    ): RelayTransport =
         CompositeRelayTransport(
             sms = SmsRelayTransport { context.getSystemService(SmsManager::class.java) },
             webhook = WebhookRelayTransport(api),
-            email = StubRelayTransport("Email delivery"),
+            email = EmailRelayTransport(secrets),
+            whatsapp = WhatsAppBusinessRelayTransport(client, secrets),
             chat = ChatWebhookRelayTransport(api, secrets)
         )
 

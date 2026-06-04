@@ -70,6 +70,9 @@ interface MessageLogDao {
     @Query("SELECT * FROM message_events ORDER BY receivedAtEpochMillis DESC LIMIT :limit")
     fun observeRecent(limit: Int): Flow<List<MessageEventEntity>>
 
+    @Query("SELECT * FROM relay_attempts ORDER BY createdAtEpochMillis DESC LIMIT :limit")
+    fun observeRecentRelays(limit: Int): Flow<List<RelayAttemptEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEvent(entity: MessageEventEntity)
 

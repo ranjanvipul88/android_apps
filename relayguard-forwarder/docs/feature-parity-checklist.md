@@ -2,14 +2,14 @@
 
 | Area | Observed target behavior | RelayGuard implementation | Status |
 | --- | --- | --- | --- |
-| Incoming SMS forwarding | Detect new SMS and route through rules | `SmsEventReceiver`, `InboundMessageWorker`, rule evaluator | Implemented skeleton |
+| Incoming SMS forwarding | Detect new SMS and route through rules | `SmsEventReceiver`, `InboundMessageWorker`, rule evaluator, real relay attempts | Implemented |
 | MMS handling | Settings/test surface for multimedia messages | MMS notification category and docs; binary MMS forwarding deferred | Planned |
 | Notification/RCS forwarding | Notification listener for selected apps/RCS-like content | `RelayNotificationListenerService` and notification event worker | Implemented skeleton |
 | Outgoing SMS forwarding | Monitor outgoing messages | Architecture documented; foreground sender audit planned | Planned |
-| Rule CRUD | Add/edit/delete/toggle filters | Room repository and Compose list/toggle; starter rule creation | Partial |
+| Rule CRUD | Add/edit/delete/toggle filters | Room repository and Compose list/toggle; quick setup creates enabled forwarding rules | Partial |
 | Conditions | Sender/body/title/package/SIM matching | Domain condition evaluator | Implemented |
 | Regex/replacements | Transform forwarded text | Domain template renderer with regex replacement | Implemented |
-| Recipients | SMS, email, URL, chat webhooks, fallback | Domain recipient model and transport dispatcher | Partial |
+| Recipients | SMS, email, URL, chat webhooks, fallback | SMS number, SMTP email, HTTPS webhook, chat webhook, and WhatsApp Business Cloud API transports | Implemented for primary destinations |
 | Secondary fallback | Try alternate recipient on failure | Model supports fallback; retry orchestration planned | Planned |
 | Duplicate prevention | Avoid repeated sends | Model flag; dedupe cache planned | Planned |
 | Working-time schedule | Restrict rule by time/day | Domain schedule model | Implemented |
@@ -26,5 +26,5 @@
 - Milestone 1: Analysis report contains features, flows, data categories, endpoint families, assumptions, and legal exclusions.
 - Milestone 2: Style guide and mockups cover rules, history, privacy, and settings.
 - Milestone 3: Unit tests pass for rule matching and template rendering; app opens to Compose shell.
-- Milestone 4: SMS and notification events persist locally and dispatch to mock transports.
+- Milestone 4: SMS events persist locally and dispatch to real SMS, SMTP, HTTPS, and WhatsApp Business destinations when configured.
 - Milestone 5: Release build, privacy docs, originality scan, manual QA checklist, and signed AAB process are complete.

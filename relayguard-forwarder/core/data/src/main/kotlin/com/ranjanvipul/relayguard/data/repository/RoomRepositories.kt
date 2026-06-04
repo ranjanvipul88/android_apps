@@ -6,6 +6,7 @@ import com.ranjanvipul.relayguard.data.local.MessageLogDao
 import com.ranjanvipul.relayguard.data.local.RelayAttemptEntity
 import com.ranjanvipul.relayguard.domain.model.ForwardFilter
 import com.ranjanvipul.relayguard.domain.model.MessageEvent
+import com.ranjanvipul.relayguard.domain.model.RelayAttempt
 import com.ranjanvipul.relayguard.domain.model.RenderedRelay
 import com.ranjanvipul.relayguard.domain.repository.FilterRepository
 import com.ranjanvipul.relayguard.domain.repository.MessageLogRepository
@@ -40,6 +41,9 @@ class RoomMessageLogRepository(
 ) : MessageLogRepository {
     override fun observeRecentEvents(limit: Int): Flow<List<MessageEvent>> =
         dao.observeRecent(limit).map { rows -> rows.map(mappers::entityToEvent) }
+
+    override fun observeRecentRelays(limit: Int): Flow<List<RelayAttempt>> =
+        dao.observeRecentRelays(limit).map { rows -> rows.map(mappers::entityToRelayAttempt) }
 
     override suspend fun recordEvent(event: MessageEvent) {
         dao.insertEvent(mappers.eventToEntity(event))

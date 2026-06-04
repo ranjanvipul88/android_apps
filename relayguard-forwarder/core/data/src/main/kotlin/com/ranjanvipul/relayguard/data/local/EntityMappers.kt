@@ -8,6 +8,8 @@ import com.ranjanvipul.relayguard.domain.model.MessageEvent
 import com.ranjanvipul.relayguard.domain.model.MessageKind
 import com.ranjanvipul.relayguard.domain.model.Recipient
 import com.ranjanvipul.relayguard.domain.model.ReplacementRule
+import com.ranjanvipul.relayguard.domain.model.RelayAttempt
+import com.ranjanvipul.relayguard.domain.model.RecipientKind
 import com.ranjanvipul.relayguard.domain.model.ScheduleWindow
 
 class EntityMappers(private val gson: Gson = Gson()) {
@@ -65,5 +67,16 @@ class EntityMappers(private val gson: Gson = Gson()) {
         packageName = entity.packageName,
         notificationTitle = entity.notificationTitle,
         attachmentCount = entity.attachmentCount
+    )
+
+    fun entityToRelayAttempt(entity: RelayAttemptEntity): RelayAttempt = RelayAttempt(
+        id = entity.id,
+        filterId = entity.filterId,
+        recipientId = entity.recipientId,
+        recipientKind = RecipientKind.valueOf(entity.recipientKind),
+        bodyPreview = entity.bodyPreview,
+        success = entity.success,
+        detail = entity.detail,
+        createdAtEpochMillis = entity.createdAtEpochMillis
     )
 }
