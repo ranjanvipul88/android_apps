@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844">
+  <rect width="390" height="844" fill="#FAFBF8"/>
+  <text x="24" y="54" font-family="Arial" font-size="24" font-weight="700" fill="#111412">RelayGuard</text>
+  <text x="24" y="78" font-family="Arial" font-size="13" fill="#52605A">Rules active</text>
+  <rect x="16" y="112" width="358" height="112" rx="8" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="32" y="146" font-family="Arial" font-size="18" font-weight="700" fill="#111412">Bank alerts</text>
+  <text x="32" y="174" font-family="Arial" font-size="13" fill="#52605A">SMS to secure webhook</text>
+  <rect x="32" y="190" width="88" height="24" rx="12" fill="#D8F2ED"/>
+  <text x="46" y="207" font-family="Arial" font-size="12" fill="#0B6B61">Incoming SMS</text>
+  <rect x="310" y="138" width="42" height="24" rx="12" fill="#0B6B61"/>
+  <circle cx="340" cy="150" r="10" fill="#FFFFFF"/>
+  <rect x="16" y="240" width="358" height="112" rx="8" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="32" y="274" font-family="Arial" font-size="18" font-weight="700" fill="#111412">Team notifications</text>
+  <text x="32" y="302" font-family="Arial" font-size="13" fill="#52605A">Selected apps to chat webhook</text>
+  <rect x="32" y="318" width="104" height="24" rx="12" fill="#ECEEFF"/>
+  <text x="46" y="335" font-family="Arial" font-size="12" fill="#5B5F97">Notification</text>
+  <rect x="310" y="266" width="42" height="24" rx="12" fill="#B8C1BC"/>
+  <circle cx="322" cy="278" r="10" fill="#FFFFFF"/>
+  <circle cx="330" cy="760" r="28" fill="#0B6B61"/>
+  <text x="320" y="770" font-family="Arial" font-size="32" fill="#FFFFFF">+</text>
+  <rect x="0" y="790" width="390" height="54" fill="#FFFFFF"/>
+  <text x="45" y="822" font-family="Arial" font-size="12" fill="#0B6B61">Rules</text>
+  <text x="134" y="822" font-family="Arial" font-size="12" fill="#52605A">History</text>
+  <text x="223" y="822" font-family="Arial" font-size="12" fill="#52605A">Privacy</text>
+  <text x="315" y="822" font-family="Arial" font-size="12" fill="#52605A">Settings</text>
+</svg>
