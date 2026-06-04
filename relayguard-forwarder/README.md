@@ -42,7 +42,7 @@ Grant the SMS permissions when prompted, open Settings, then create one or more 
 
 - Forward to another phone: enter the destination number and tap `Enable SMS forwarding`.
 - Forward to email: enter SMTP host, port, username, app password, from address, and recipient email. Port 587 uses STARTTLS; check SSL/TLS for port 465.
-- Forward to WhatsApp: use Meta's official WhatsApp Business Cloud API `messages` endpoint, recipient phone number, and bearer token. Regular consumer WhatsApp does not allow silent background message injection by third-party Android apps.
+- Forward to Telegram: enter a Telegram bot token and the contact/chat id. The recipient must have started the bot or be reachable by that bot.
 
 Delivery successes and failures appear in the History tab under `Delivery attempts`.
 

@@ -25,7 +25,7 @@ RelayGuard processes message content only to perform user-configured forwarding 
 
 - Network delivery uses HTTPS by default.
 - Email delivery connects directly to the SMTP server configured by the user and sends only the rendered forwarding message.
-- WhatsApp delivery uses Meta's official WhatsApp Business Cloud API endpoint configured by the user; regular consumer WhatsApp is not automated.
+- Telegram delivery uses the Telegram Bot API with the bot token and chat id configured by the user.
 - SMS delivery uses Android's standard `SmsManager`.
 - Data is transmitted only to user-configured recipients.
 

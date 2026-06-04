@@ -29,15 +29,15 @@ class CompositeRelayTransport(
     private val sms: SmsRelayTransport,
     private val webhook: WebhookRelayTransport,
     private val email: EmailRelayTransport,
-    private val whatsapp: WhatsAppBusinessRelayTransport,
-    private val chat: ChatWebhookRelayTransport
+    private val telegram: TelegramRelayTransport,
+    private val slack: SlackRelayTransport
 ) : RelayTransport {
     override suspend fun send(relay: RenderedRelay): Result<Unit> = when (relay.recipient.kind) {
         RecipientKind.SmsNumber -> sms.send(relay)
         RecipientKind.Webhook -> webhook.send(relay)
         RecipientKind.Email -> email.send(relay)
-        RecipientKind.WhatsAppBusiness -> whatsapp.send(relay)
-        RecipientKind.Telegram, RecipientKind.Slack -> chat.send(relay)
+        RecipientKind.Telegram -> telegram.send(relay)
+        RecipientKind.Slack -> slack.send(relay)
     }
 }
 
@@ -70,6 +70,49 @@ class ChatWebhookRelayTransport(
     }
 }
 
+class TelegramRelayTransport(
+    private val client: OkHttpClient,
+    private val secretStore: SecretStore,
+    private val gson: Gson = Gson()
+) : RelayTransport {
+    override suspend fun send(relay: RenderedRelay): Result<Unit> = runCatching {
+        val token = relay.recipient.secretAlias?.let(secretStore::get).orEmpty()
+        val chatId = relay.recipient.address
+        require(token.isNotBlank()) { "Telegram bot token is required." }
+        require(chatId.isNotBlank()) { "Telegram chat id is required." }
+        withContext(Dispatchers.IO) {
+            val request = Request.Builder()
+                .url("https://api.telegram.org/bot$token/sendMessage")
+                .post(
+                    gson.toJson(mapOf("chat_id" to chatId, "text" to relay.body))
+                        .toRequestBody("application/json".toMediaType())
+                )
+                .build()
+            client.newCall(request).execute().use { response ->
+                check(response.isSuccessful) { "Telegram returned HTTP ${response.code}" }
+            }
+        }
+    }
+}
+
+class SlackRelayTransport(
+    private val client: OkHttpClient,
+    private val gson: Gson = Gson()
+) : RelayTransport {
+    override suspend fun send(relay: RenderedRelay): Result<Unit> = runCatching {
+        require(relay.recipient.address.startsWith("https://")) { "Slack webhook must use HTTPS." }
+        withContext(Dispatchers.IO) {
+            val request = Request.Builder()
+                .url(relay.recipient.address)
+                .post(gson.toJson(mapOf("text" to relay.body)).toRequestBody("application/json".toMediaType()))
+                .build()
+            client.newCall(request).execute().use { response ->
+                check(response.isSuccessful) { "Slack returned HTTP ${response.code}" }
+            }
+        }
+    }
+}
+
 enum class SmtpSecurity {
     StartTls,
     SslTls
@@ -82,11 +125,6 @@ data class SmtpEmailConfig(
     val username: String,
     val fromAddress: String,
     val toAddress: String
-)
-
-data class WhatsAppBusinessConfig(
-    val messagesEndpoint: String,
-    val toPhoneNumber: String
 )
 
 class EmailRelayTransport(
@@ -104,37 +142,6 @@ class EmailRelayTransport(
                 subject = "Forwarded SMS from RelayGuard",
                 body = relay.body
             )
-        }
-    }
-}
-
-class WhatsAppBusinessRelayTransport(
-    private val client: OkHttpClient,
-    private val secretStore: SecretStore,
-    private val gson: Gson = Gson()
-) : RelayTransport {
-    override suspend fun send(relay: RenderedRelay): Result<Unit> = runCatching {
-        val config = gson.fromJson(relay.recipient.address, WhatsAppBusinessConfig::class.java)
-        val token = relay.recipient.secretAlias?.let(secretStore::get).orEmpty()
-        require(config.messagesEndpoint.startsWith("https://")) { "WhatsApp endpoint must use HTTPS." }
-        require(config.toPhoneNumber.isNotBlank()) { "WhatsApp recipient phone number is required." }
-        require(token.isNotBlank()) { "WhatsApp Business API token is required." }
-
-        val payload = mapOf(
-            "messaging_product" to "whatsapp",
-            "to" to config.toPhoneNumber,
-            "type" to "text",
-            "text" to mapOf("body" to relay.body)
-        )
-        withContext(Dispatchers.IO) {
-            val request = Request.Builder()
-                .url(config.messagesEndpoint)
-                .addHeader("Authorization", "Bearer $token")
-                .post(gson.toJson(payload).toRequestBody("application/json".toMediaType()))
-                .build()
-            client.newCall(request).execute().use { response ->
-                check(response.isSuccessful) { "WhatsApp Business API returned HTTP ${response.code}" }
-            }
         }
     }
 }

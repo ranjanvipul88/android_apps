@@ -11,11 +11,11 @@ import com.ranjanvipul.relayguard.data.repository.RoomFilterRepository
 import com.ranjanvipul.relayguard.data.repository.RoomMessageLogRepository
 import com.ranjanvipul.relayguard.data.security.AndroidSecretStore
 import com.ranjanvipul.relayguard.data.security.SecretStore
-import com.ranjanvipul.relayguard.data.transport.ChatWebhookRelayTransport
 import com.ranjanvipul.relayguard.data.transport.CompositeRelayTransport
 import com.ranjanvipul.relayguard.data.transport.EmailRelayTransport
+import com.ranjanvipul.relayguard.data.transport.SlackRelayTransport
 import com.ranjanvipul.relayguard.data.transport.SmsRelayTransport
-import com.ranjanvipul.relayguard.data.transport.WhatsAppBusinessRelayTransport
+import com.ranjanvipul.relayguard.data.transport.TelegramRelayTransport
 import com.ranjanvipul.relayguard.data.transport.WebhookRelayTransport
 import com.ranjanvipul.relayguard.domain.repository.FilterRepository
 import com.ranjanvipul.relayguard.domain.repository.MessageLogRepository
@@ -81,8 +81,8 @@ object AppModule {
             sms = SmsRelayTransport { context.getSystemService(SmsManager::class.java) },
             webhook = WebhookRelayTransport(api),
             email = EmailRelayTransport(secrets),
-            whatsapp = WhatsAppBusinessRelayTransport(client, secrets),
-            chat = ChatWebhookRelayTransport(api, secrets)
+            telegram = TelegramRelayTransport(client, secrets),
+            slack = SlackRelayTransport(client)
         )
 
     @Provides

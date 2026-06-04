@@ -15,7 +15,7 @@
 4. Send a test SMS from another phone or emulator and confirm the second phone receives the forwarded message.
 5. Confirm the original message and the successful SMS delivery attempt appear in History.
 6. Create an email rule with a test SMTP account or app password, then send another SMS and confirm the email arrives.
-7. Create a WhatsApp Business rule with a test Meta Cloud API phone number, messages endpoint, recipient phone, and bearer token; confirm the API accepts the message.
+7. Create a Telegram rule with a test bot token and contact/chat id; confirm the Telegram message arrives.
 8. Toggle each rule off and confirm no delivery attempts are created for disabled rules.
 9. Enable notification access and select one test package.
 10. Confirm only selected app notifications are processed.
