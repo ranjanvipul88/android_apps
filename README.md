@@ -26,6 +26,13 @@ android_apps/
       server.js
       package.json
       public/
+  relayguard-forwarder/
+    README.md                  # Original clean-room SMS/notification forwarding app
+    app/
+    core/
+    docs/
+    design/
+    tools/
 ```
 
 Each app is kept in its own top-level folder. Work inside one app should not affect the others as long as each app keeps its own Gradle project files and Android app module.
@@ -44,6 +51,15 @@ A premium, production-ready replica of Google Messages App with advanced cellula
 - **Auto-Forwarder**: Integrates a background receiver that intercepts incoming cellular SMS and routes them via `SmsManager` to a configured target number.
 - **Web Sync Portal**: Node.js Express & SQLite cloud server with a premium Material 3 dashboard, syncing cellular message logs. Bypasses standard battery saver timeouts by persisting messages in the cloud.
 - **Never-Expiring Sessions**: Web portal logins utilize persistent security tokens with a **99-year session life**, ensuring you never sign out even if accessed once a year.
+
+### 3. RelayGuard Forwarder (`relayguard-forwarder`)
+An original Kotlin + Jetpack Compose Android app for user-controlled SMS, notification, and webhook forwarding workflows.
+
+- **Clean-room implementation**: APK analysis was used only for high-level feature discovery; no decompiled code, resources, assets, strings, or endpoints are reused.
+- **Modern Android stack**: Kotlin, Compose Material 3, Hilt, Room, WorkManager, Retrofit, OkHttp, and Android Keystore-backed encrypted preferences.
+- **Forwarding rules**: Original domain model for SMS/notification event types, conditions, schedules, recipients, templates, and delivery history.
+- **Privacy-first defaults**: Minimal manifest permissions, HTTPS-first network security, no ads/paywalls, no embedded vendor credentials.
+- **Deliverables included**: APK analysis report, inspiration log, permission rationale, privacy summary, style guide, mockups, QA plan, acceptance checklist, and originality scan script.
 
 ---
 
@@ -72,6 +88,7 @@ Create each new app as a top-level folder:
 android_apps/
   chatdock-web/
   personal_sms/
+  relayguard-forwarder/
   my-next-app/
 ```
 

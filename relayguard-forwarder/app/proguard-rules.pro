@@ -1,0 +1,2 @@
+-keep class com.ranjanvipul.relayguard.domain.model.** { *; }
+-keepattributes Signature
