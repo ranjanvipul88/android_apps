@@ -6,6 +6,7 @@ import java.time.LocalTime
 enum class MessageKind {
     IncomingSms,
     IncomingMmsNotice,
+    IncomingRcs,
     OutgoingSms,
     AppNotification
 }
@@ -14,7 +15,6 @@ enum class RecipientKind {
     SmsNumber,
     Email,
     Webhook,
-    WhatsAppBusiness,
     Telegram,
     Slack
 }

@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.ranjanvipul.relayguard.worker.RelayWorkScheduler
 import com.ranjanvipul.relayguard.worker.StartupAuditWorker
 
 class BootCompletedReceiver : BroadcastReceiver() {
@@ -16,6 +17,8 @@ class BootCompletedReceiver : BroadcastReceiver() {
                 ExistingWorkPolicy.REPLACE,
                 OneTimeWorkRequestBuilder<StartupAuditWorker>().build()
             )
+            RelayWorkScheduler.scheduleOutgoingScans(context)
+            RelayWorkScheduler.runOutgoingScanNow(context)
         }
     }
 }

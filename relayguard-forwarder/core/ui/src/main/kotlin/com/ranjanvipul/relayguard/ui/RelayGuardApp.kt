@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.automirrored.outlined.Rule
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ranjanvipul.relayguard.domain.model.ForwardFilter
 import com.ranjanvipul.relayguard.domain.model.MessageEvent
+import com.ranjanvipul.relayguard.domain.model.MessageKind
 import com.ranjanvipul.relayguard.domain.model.RelayAttempt
 
 private enum class Tab { Filters, History, Privacy, Settings }
@@ -55,9 +57,14 @@ private enum class Tab { Filters, History, Privacy, Settings }
 fun RelayGuardApp(
     state: RelayGuardUiState,
     onToggleFilter: (String, Boolean) -> Unit,
-    onCreateSmsForward: (String) -> Unit,
-    onCreateEmailForward: (String, String, String, String, String, String, Boolean) -> Unit,
-    onCreateWhatsAppBusinessForward: (String, String, String) -> Unit
+    onDeleteFilter: (String) -> Unit,
+    onCreateSmsForward: (String, Set<MessageKind>) -> Unit,
+    onCreateEmailForward: (String, String, String, String, String, String, Boolean, Set<MessageKind>) -> Unit,
+    onCreateTelegramForward: (String, String, Set<MessageKind>) -> Unit,
+    onCreateSlackForward: (String, Set<MessageKind>) -> Unit,
+    onCreateWebhookForward: (String, Set<MessageKind>) -> Unit,
+    onExportBackup: () -> Unit,
+    onRestoreBackup: () -> Unit
 ) {
     var tab by remember { mutableStateOf(Tab.Filters) }
     Scaffold(
@@ -110,13 +117,17 @@ fun RelayGuardApp(
     ) { padding ->
         Crossfade(targetState = tab, label = "screen") { current ->
             when (current) {
-                Tab.Filters -> FilterScreen(state.filters, onToggleFilter, Modifier.padding(padding))
+                Tab.Filters -> FilterScreen(state.filters, onToggleFilter, onDeleteFilter, Modifier.padding(padding))
                 Tab.History -> HistoryScreen(state.history, state.relayAttempts, Modifier.padding(padding))
                 Tab.Privacy -> PrivacyScreen(state, Modifier.padding(padding))
                 Tab.Settings -> SettingsScreen(
                     onCreateSmsForward = onCreateSmsForward,
                     onCreateEmailForward = onCreateEmailForward,
-                    onCreateWhatsAppBusinessForward = onCreateWhatsAppBusinessForward,
+                    onCreateTelegramForward = onCreateTelegramForward,
+                    onCreateSlackForward = onCreateSlackForward,
+                    onCreateWebhookForward = onCreateWebhookForward,
+                    onExportBackup = onExportBackup,
+                    onRestoreBackup = onRestoreBackup,
                     modifier = Modifier.padding(padding)
                 )
             }
@@ -125,7 +136,12 @@ fun RelayGuardApp(
 }
 
 @Composable
-private fun FilterScreen(filters: List<ForwardFilter>, onToggle: (String, Boolean) -> Unit, modifier: Modifier) {
+private fun FilterScreen(
+    filters: List<ForwardFilter>,
+    onToggle: (String, Boolean) -> Unit,
+    onDelete: (String) -> Unit,
+    modifier: Modifier
+) {
     LazyColumn(
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -150,6 +166,10 @@ private fun FilterScreen(filters: List<ForwardFilter>, onToggle: (String, Boolea
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         filter.messageKinds.take(3).forEach { AssistChip(onClick = {}, label = { Text(it.name) }) }
+                    }
+                    Button(onClick = { onDelete(filter.id) }) {
+                        Icon(Icons.Outlined.Delete, contentDescription = null)
+                        Text("Delete")
                     }
                 }
             }
@@ -217,9 +237,13 @@ private fun PrivacyScreen(state: RelayGuardUiState, modifier: Modifier) {
 
 @Composable
 private fun SettingsScreen(
-    onCreateSmsForward: (String) -> Unit,
-    onCreateEmailForward: (String, String, String, String, String, String, Boolean) -> Unit,
-    onCreateWhatsAppBusinessForward: (String, String, String) -> Unit,
+    onCreateSmsForward: (String, Set<MessageKind>) -> Unit,
+    onCreateEmailForward: (String, String, String, String, String, String, Boolean, Set<MessageKind>) -> Unit,
+    onCreateTelegramForward: (String, String, Set<MessageKind>) -> Unit,
+    onCreateSlackForward: (String, Set<MessageKind>) -> Unit,
+    onCreateWebhookForward: (String, Set<MessageKind>) -> Unit,
+    onExportBackup: () -> Unit,
+    onRestoreBackup: () -> Unit,
     modifier: Modifier
 ) {
     var smsPhone by rememberSaveable { mutableStateOf("") }
@@ -230,14 +254,39 @@ private fun SettingsScreen(
     var smtpPassword by rememberSaveable { mutableStateOf("") }
     var smtpFrom by rememberSaveable { mutableStateOf("") }
     var smtpSsl by rememberSaveable { mutableStateOf(false) }
-    var whatsappEndpoint by rememberSaveable { mutableStateOf("") }
-    var whatsappPhone by rememberSaveable { mutableStateOf("") }
-    var whatsappToken by rememberSaveable { mutableStateOf("") }
+    var telegramToken by rememberSaveable { mutableStateOf("") }
+    var telegramChatId by rememberSaveable { mutableStateOf("") }
+    var slackWebhook by rememberSaveable { mutableStateOf("") }
+    var genericWebhook by rememberSaveable { mutableStateOf("") }
+    var includeSms by rememberSaveable { mutableStateOf(true) }
+    var includeMms by rememberSaveable { mutableStateOf(false) }
+    var includeRcs by rememberSaveable { mutableStateOf(false) }
+    var includeOutgoing by rememberSaveable { mutableStateOf(false) }
+    var includeNotifications by rememberSaveable { mutableStateOf(false) }
+    val selectedKinds = buildSet {
+        if (includeSms) add(MessageKind.IncomingSms)
+        if (includeMms) add(MessageKind.IncomingMmsNotice)
+        if (includeRcs) add(MessageKind.IncomingRcs)
+        if (includeOutgoing) add(MessageKind.OutgoingSms)
+        if (includeNotifications) add(MessageKind.AppNotification)
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        item {
+            Card {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Event types", style = MaterialTheme.typography.titleMedium)
+                    EventKindRow("Incoming SMS", includeSms) { includeSms = it }
+                    EventKindRow("MMS notices", includeMms) { includeMms = it }
+                    EventKindRow("RCS broadcasts", includeRcs) { includeRcs = it }
+                    EventKindRow("Outgoing SMS", includeOutgoing) { includeOutgoing = it }
+                    EventKindRow("App notifications", includeNotifications) { includeNotifications = it }
+                }
+            }
+        }
         item {
             Card {
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -249,7 +298,7 @@ private fun SettingsScreen(
                         label = { Text("Destination phone number") },
                         singleLine = true
                     )
-                    Button(onClick = { onCreateSmsForward(smsPhone) }, enabled = smsPhone.isNotBlank()) {
+                    Button(onClick = { onCreateSmsForward(smsPhone, selectedKinds) }, enabled = smsPhone.isNotBlank() && selectedKinds.isNotEmpty()) {
                         Text("Enable SMS forwarding")
                     }
                 }
@@ -310,9 +359,9 @@ private fun SettingsScreen(
                     )
                     Button(
                         onClick = {
-                            onCreateEmailForward(emailTo, smtpHost, smtpPort, smtpUser, smtpPassword, smtpFrom, smtpSsl)
+                            onCreateEmailForward(emailTo, smtpHost, smtpPort, smtpUser, smtpPassword, smtpFrom, smtpSsl, selectedKinds)
                         },
-                        enabled = emailTo.isNotBlank() && smtpHost.isNotBlank()
+                        enabled = emailTo.isNotBlank() && smtpHost.isNotBlank() && selectedKinds.isNotEmpty()
                     ) {
                         Text("Enable email forwarding")
                     }
@@ -322,45 +371,93 @@ private fun SettingsScreen(
         item {
             Card {
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Forward to WhatsApp Business", style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "Uses Meta's official WhatsApp Business Cloud API. Regular WhatsApp cannot receive silent app-to-app forwards.",
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Text("Forward to Telegram contact", style = MaterialTheme.typography.titleMedium)
                     OutlinedTextField(
-                        value = whatsappEndpoint,
-                        onValueChange = { whatsappEndpoint = it },
+                        value = telegramToken,
+                        onValueChange = { telegramToken = it },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Messages endpoint URL") },
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = whatsappPhone,
-                        onValueChange = { whatsappPhone = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("WhatsApp recipient phone") },
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = whatsappToken,
-                        onValueChange = { whatsappToken = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Cloud API bearer token") },
+                        label = { Text("Bot token") },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation()
                     )
+                    OutlinedTextField(
+                        value = telegramChatId,
+                        onValueChange = { telegramChatId = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Contact chat id") },
+                        singleLine = true
+                    )
                     Button(
-                        onClick = {
-                            onCreateWhatsAppBusinessForward(whatsappEndpoint, whatsappPhone, whatsappToken)
-                        },
-                        enabled = whatsappEndpoint.startsWith("https://") && whatsappPhone.isNotBlank() && whatsappToken.isNotBlank()
+                        onClick = { onCreateTelegramForward(telegramToken, telegramChatId, selectedKinds) },
+                        enabled = telegramToken.isNotBlank() && telegramChatId.isNotBlank() && selectedKinds.isNotEmpty()
                     ) {
-                        Text("Enable WhatsApp forwarding")
+                        Text("Enable Telegram contact forwarding")
+                    }
+                }
+            }
+        }
+        item {
+            Card {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Forward to Slack", style = MaterialTheme.typography.titleMedium)
+                    OutlinedTextField(
+                        value = slackWebhook,
+                        onValueChange = { slackWebhook = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Incoming webhook URL") },
+                        singleLine = true
+                    )
+                    Button(
+                        onClick = { onCreateSlackForward(slackWebhook, selectedKinds) },
+                        enabled = slackWebhook.startsWith("https://") && selectedKinds.isNotEmpty()
+                    ) {
+                        Text("Enable Slack forwarding")
+                    }
+                }
+            }
+        }
+        item {
+            Card {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Forward to HTTPS webhook", style = MaterialTheme.typography.titleMedium)
+                    OutlinedTextField(
+                        value = genericWebhook,
+                        onValueChange = { genericWebhook = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Webhook URL") },
+                        singleLine = true
+                    )
+                    Button(
+                        onClick = { onCreateWebhookForward(genericWebhook, selectedKinds) },
+                        enabled = genericWebhook.startsWith("https://") && selectedKinds.isNotEmpty()
+                    ) {
+                        Text("Enable webhook forwarding")
+                    }
+                }
+            }
+        }
+        item {
+            Card {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Backup and restore", style = MaterialTheme.typography.titleMedium)
+                    Button(onClick = onExportBackup) {
+                        Text("Save local backup")
+                    }
+                    Button(onClick = onRestoreBackup) {
+                        Text("Restore local backup")
                     }
                 }
             }
         }
         item { EmptyCard("Security defaults", "Cleartext traffic is disabled outside debug/local development. Secrets are stored with Android Keystore.") }
+    }
+}
+
+@Composable
+private fun EventKindRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        Text(label, modifier = Modifier.padding(top = 14.dp))
     }
 }
 

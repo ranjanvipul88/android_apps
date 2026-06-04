@@ -6,22 +6,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.ranjanvipul.relayguard.domain.model.MessageEvent
 import com.ranjanvipul.relayguard.domain.model.MessageKind
-import com.ranjanvipul.relayguard.domain.repository.FilterRepository
-import com.ranjanvipul.relayguard.domain.repository.MessageLogRepository
-import com.ranjanvipul.relayguard.domain.repository.RelayTransport
-import com.ranjanvipul.relayguard.domain.usecase.EvaluateMessageUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.first
 
 @HiltWorker
 class NotificationEventWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val filters: FilterRepository,
-    private val messages: MessageLogRepository,
-    private val transport: RelayTransport,
-    private val evaluate: EvaluateMessageUseCase
+    private val dispatcher: RelayDispatcher
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val event = MessageEvent(
@@ -33,11 +25,7 @@ class NotificationEventWorker @AssistedInject constructor(
             packageName = inputData.getString(KEY_PACKAGE),
             notificationTitle = inputData.getString(KEY_TITLE)
         )
-        messages.recordEvent(event)
-        evaluate.evaluate(event, filters.observeFilters().first()).forEach { relay ->
-            val result = transport.send(relay)
-            messages.recordRelay(relay, result.isSuccess, result.exceptionOrNull()?.message)
-        }
+        dispatcher.dispatch(event)
         return Result.success()
     }
 

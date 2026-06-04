@@ -21,9 +21,14 @@ class RelayGuardAppTest {
                 RelayGuardApp(
                     state = RelayGuardUiState(permissions = PermissionCatalog.required),
                     onToggleFilter = { _, _ -> },
-                    onCreateSmsForward = {},
-                    onCreateEmailForward = { _, _, _, _, _, _, _ -> },
-                    onCreateWhatsAppBusinessForward = { _, _, _ -> }
+                    onDeleteFilter = {},
+                    onCreateSmsForward = { _, _ -> },
+                    onCreateEmailForward = { _, _, _, _, _, _, _, _ -> },
+                    onCreateTelegramForward = { _, _, _ -> },
+                    onCreateSlackForward = { _, _ -> },
+                    onCreateWebhookForward = { _, _ -> },
+                    onExportBackup = {},
+                    onRestoreBackup = {}
                 )
             }
         }

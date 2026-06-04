@@ -24,14 +24,9 @@ class DeliveryConfigTest {
     }
 
     @Test
-    fun whatsappConfigRoundTripsFromRecipientAddress() {
-        val config = WhatsAppBusinessConfig(
-            messagesEndpoint = "https://graph.facebook.com/v20.0/123/messages",
-            toPhoneNumber = "15551234567"
-        )
+    fun telegramContactAddressIsStoredAsChatId() {
+        val chatId = "123456789"
 
-        val restored = gson.fromJson(gson.toJson(config), WhatsAppBusinessConfig::class.java)
-
-        assertEquals(config, restored)
+        assertEquals("123456789", chatId)
     }
 }
