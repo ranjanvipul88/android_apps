@@ -1,6 +1,6 @@
 # SMS Backup & Safe Forwarding App
 
-A privacy-first, minimal-permission Android application built with modern Kotlin and Jetpack Compose. This application operates as a secure, local, encrypted SMS vault with the ability to sync historical messages, backup to the cloud, and safely forward incoming alerts based on custom rules. 
+A privacy-first, minimal-permission Android application built with modern Kotlin and Jetpack Compose. This application operates as a secure, local, encrypted SMS vault with the ability to sync historical messages, backup to the cloud, and safely forward incoming alerts based on custom rules.
 
 The app is fully compliant with Google Play Store SMS Policies, integrating strict, non-bypassable security checks to guarantee that banking notices, transactions, and OTPs are **never** forwarded out of the secure environment.
 
@@ -18,10 +18,11 @@ The app is fully compliant with Google Play Store SMS Policies, integrating stri
 
 ## ✨ Core Features
 
-*   **🔒 The Cipher Vault (AES-256-GCM)**: Every incoming or historically synced text message is immediately encrypted on the device using Android's hardware Keystore before writing to the local Room database. 
-*   **📡 Safe Authorized Forwarding Matrix**: Forwarding rules execute strictly on explicit triggers (e.g., "From specific contact/mobile" forwarding to a dedicated number). Toggles allow immediate revokes and include an instant "Undo" recovery feature.
+*   **🔒 The Cipher Vault (AES-256-GCM)**: Every incoming or historically synced text message is immediately encrypted on the device using Android's hardware Keystore before writing to the local Room database. Keys are safely stored in Android Keystore System and never transmitted or exposed in plaintext.
+*   **📡 Safe Authorized Forwarding Matrix**: Forwarding rules execute strictly on explicit triggers (e.g., "From specific contact/mobile" or "All Contacts/Numbers" forwarding to a dedicated number of your spouse or system). Toggles allow immediate revokes and include an instant "Undo" recovery feature.
 *   **🛡️ Dynamic Banking & OTP Guardrails**: Features a non-bypassable checking engine with regex heuristics and keyword databases that filters out transaction PINs, verification OTPs, two-factor authentication formats, bank account debits, and credit updates.
 *   **☁️ Dual Backup Infrastructure**: Export your entire Cipher Vault and rules matrix directly to an offline JSON file via Android SAF, or authenticate seamlessly via Google Sign-In to sync the encrypted archive to your private Google Drive.
+*   **🔐 Biometric App Lock**: Hardened app lifecycle that instantly obscures sensitive texts when the app is backgrounded, requiring biometric/fingerprint authentication to re-enter.
 
 ---
 
@@ -35,7 +36,13 @@ To prevent security vulnerabilities, malicious usage, or the inadvertent collect
 | **Multi-digit Pin Quarantines** | Scans for standard 4-to-8 digit numbering arrangements situated in proximity of secure verification identifiers (PIN, Code, OTP, Confirm). | Prevent credential extraction |
 | **Log Leakage Protection** | No raw plain-text message contents are recorded to audit trace logs. Senders are masked (e.g. `+155******76`) and blocking reasons are generalized. | Privacy at-rest compliance |
 | **No Background Server syncs** | Transmitting matching alerts depends on native, cellular, on-device `SmsManager` utilities. Runs no web sync background sockets. | Minimal-permissions posture |
+| **Secure Purges** | Instantly wipes database keys, backups, logging trails, and preferences during a Master Purge. | Hard data-lifecycle controls |
 | **Biometric Master Lock** | The app's lifecycle is guarded by native Android Biometric prompts, requiring fingerprint/face authentication upon returning to the app from the background. | Physical unauthorized access prevention |
+
+### Security Exclusion Proof Patterns Tested
+*   *Blocked Output:* "Your login validation PIN is 918231. Valid for 5 mins." -> **`BLOCKED_OTP`**
+*   *Blocked Output:* "BANK: Account ending 1234 debited $150.00 at Costco" -> **`BLOCKED_OTP`**
+*   *Approved Output:* "Hey, can you please pick up milk on your way back?" -> **`FORWARDED`**
 
 ---
 
@@ -83,6 +90,7 @@ A chronological on-device security audit trace displays every operation context.
 The codebase utilizes standard modern Android architecture:
 *   **Jetpack Compose**: Pure declarative Material 3 interface layer.
 *   **Room SQL Databases**: Sandboxed SQLite storage using Kotlin coroutines `Flow` models.
+*   **BroadcastReceiver**: Securely checks cellular messages immediately at receipt.
 *   **Android KeyStore**: Generates Symmetric AES keys safely within hardware security modules.
 
 ```
@@ -93,11 +101,14 @@ The codebase utilizes standard modern Android architecture:
 │   ├── EncryptionHelper.kt        # AES-256-GCM Cryptographic system
 │   └── Repository.kt              # Combines Room streams and encryption routines
 ├── receiver/
-│   └── SmsReceiver.kt             # Handles SMS_RECEIVED broadcast notifications
+│   ├── SmsReceiver.kt             # Handles SMS_RECEIVED broadcast notifications
+│   ├── ForwardingWorker.kt        # WorkManager jobs for email/telegram forwarding
+│   └── SyncEngine.kt              # Engine to ingest native Historical SMS
 ├── security/
 │   └── SmsSecurityAnalyzer.kt     # Financial/OTP pattern detection parser
 └── ui/
     ├── SmsDashboardMain.kt        # Entire Material 3 dashboard, Vault, & Dual Backup logic
+    ├── GoogleDriveHelper.kt       # Google Drive OAuth and REST sync logic
     └── SmsViewModel.kt            # LiveState flows and Background Sync Engine
 ```
 
