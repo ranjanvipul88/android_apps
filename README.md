@@ -61,6 +61,14 @@ An original Kotlin + Jetpack Compose Android app for user-controlled SMS, notifi
 - **Privacy-first defaults**: Minimal manifest permissions, HTTPS-first network security, no ads/paywalls, no embedded vendor credentials.
 - **Deliverables included**: APK analysis report, inspiration log, permission rationale, privacy summary, style guide, mockups, QA plan, acceptance checklist, and originality scan script.
 
+### 4. SMS Backup & Safe Forward (`sms-backup-&-safe-forward`)
+A comprehensive, privacy-first secure SMS Vault and auto-forwarding engine.
+
+- **Encrypted Vault**: Instantly syncs and intercepts all incoming/outgoing text messages and stores them locally using AES-GCM encryption.
+- **Dual Backup & Restore**: Securely export your entire SMS history and routing configurations to Google Drive, or keep it strictly offline via Local Device Export (JSON).
+- **Rule-based Forwarding**: Setup customizable triggers to securely route designated texts while automatically filtering out sensitive banking alerts, OTPs, and verification PINs.
+- **Biometric App Lock**: Hardened app lifecycle that instantly obscures sensitive texts when the app is backgrounded, requiring biometric/fingerprint authentication to re-enter.
+
 ---
 
 ## Working On One App Only

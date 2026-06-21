@@ -1,0 +1,6 @@
+{
+  "name": "SafeForward",
+  "description": "An Android application providing user-authorized SMS backup and optional secure forwarding with privacy-first filters and OTP exclusions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
